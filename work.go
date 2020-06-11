@@ -29,7 +29,8 @@ type OnError func(work Work, err error)
 type LoopFunc func(ctx context.Context) (err error)
 
 type workBase struct {
-	id string
+	id   string
+	Name string
 	WorkOptions
 	workPool  *WorkPool
 	loopFunc  LoopFunc
@@ -62,7 +63,11 @@ func (w *workBase) checkOptions() {
 		w.OnError = defaultOnError()
 	}
 }
-
+func (w *workBase) setOptions(options *WorkOptions) {
+	if options != nil {
+		w.WorkOptions = *options
+	}
+}
 func (w *workBase) init(workPool *WorkPool, name string, loopFunc LoopFunc) {
 	w.loopFunc = loopFunc
 	w.workPool = workPool

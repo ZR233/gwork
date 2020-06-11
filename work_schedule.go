@@ -199,6 +199,6 @@ func (w *WorkSchedule) Run() {
 }
 
 func (w *WorkSchedule) WithOptions(options *WorkOptions) Work {
-	w.WorkOptions = *options
+	w.setOptions(options)
 	return w
 }

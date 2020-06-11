@@ -8,7 +8,7 @@ type WorkInterval struct {
 }
 
 func (w *WorkInterval) WithOptions(options *WorkOptions) Work {
-	w.WorkOptions = *options
+	w.setOptions(options)
 	return w
 }
 

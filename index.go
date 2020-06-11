@@ -5,7 +5,6 @@ import "context"
 type WorkOptions struct {
 	RunImmediately bool //程序启动后立即执行一次
 	Description    string
-	Name           string
 	ReportToCenter bool //执行结果发送至管理中心
 	OnError        OnError
 }
