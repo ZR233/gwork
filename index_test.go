@@ -2,6 +2,7 @@ package gwork
 
 import (
 	"context"
+	"fmt"
 	"github.com/sirupsen/logrus"
 	"testing"
 	"time"
@@ -15,6 +16,8 @@ func testOnError() OnError {
 func testLoopFunc() LoopFunc {
 	return func(ctx context.Context) (err error) {
 		logrus.Info("run once")
+		err = fmt.Errorf("出现错误")
+		panic(err)
 		return
 	}
 }

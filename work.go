@@ -124,7 +124,7 @@ func (w *workBase) excLoopFunc(work Work) {
 		return
 	}
 
-	err = w.loopFunc(w.ctx)
+	err = w.excLoop()
 	if err != nil {
 		w.OnError(work, err)
 	}
