@@ -6,21 +6,25 @@ import (
 )
 
 type WorkPool struct {
-	works  map[string]Work
+	works map[string]Work
+	WorkPoolOptions
 	ctx    context.Context
 	cancel context.CancelFunc
 }
 
-func (w *WorkPool) AddIntervalWork(interval time.Duration, loopFunc LoopFunc, onError OnError) {
-	w.addWork(newWorkInterval(w, interval, loopFunc, onError))
+func (w *WorkPool) AddIntervalWork(name string, interval time.Duration, loopFunc LoopFunc) (work Work) {
+	work = newWorkInterval(w, name, interval, loopFunc)
+	w.addWork(work)
+	return
 }
-func (w *WorkPool) AddScheduleWork(schedule *Schedule, loopFunc LoopFunc, onError OnError) {
-	w.addWork(newWorkSchedule(w, schedule, loopFunc, onError))
+func (w *WorkPool) AddScheduleWork(name string, schedule *Schedule, loopFunc LoopFunc) (work Work) {
+	work = newWorkSchedule(w, name, schedule, loopFunc)
+	w.addWork(work)
+	return
 }
 
 func (w *WorkPool) addWork(work Work) {
 	w.works[work.Id()] = work
-	go runWork(work)
 }
 
 func runWork(work Work) {

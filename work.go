@@ -2,18 +2,20 @@ package gwork
 
 import (
 	"context"
+	"fmt"
 	"github.com/ZR233/gwork/errors"
 	"github.com/sirupsen/logrus"
+	"path"
+	"sync"
 	"time"
 )
 
 type Work interface {
-	SetId(string)
+	Run()
+	WithOptions(options *WorkOptions) Work
 	Id() string
 	Cancel()
 	Join()
-	SetDescription(string)
-	GetDescription() string
 	loop()
 	isRunImmediately() bool
 	//ctx done
@@ -27,20 +29,19 @@ type OnError func(work Work, err error)
 type LoopFunc func(ctx context.Context) (err error)
 
 type workBase struct {
-	id             string
-	runImmediately bool
-	description    string
-	workPool       *WorkPool
-	loopFunc       LoopFunc
-	onError        OnError
-	ctx            context.Context
-	cancel         context.CancelFunc
-	stopped        chan bool
-	loopTimer      *time.Timer
+	id string
+	WorkOptions
+	workPool  *WorkPool
+	loopFunc  LoopFunc
+	ctx       context.Context
+	cancel    context.CancelFunc
+	stopped   chan bool
+	loopTimer *time.Timer
+	sync.Mutex
 }
 
 func (w *workBase) isRunImmediately() bool {
-	return w.runImmediately
+	return w.RunImmediately
 }
 func (w *workBase) Id() string {
 	return w.id
@@ -55,16 +56,27 @@ func (w *workBase) getLoopTimer() *time.Timer {
 func (w *workBase) SetId(id string) {
 	w.id = id
 }
-
-func (w *workBase) SetDescription(str string) {
-	w.description = str
+func (w *workBase) checkOptions() {
+	if w.onError == nil {
+		logrus.Warn(fmt.Sprintf("work[%s] using default OnError", w.Id()))
+		w.onError = defaultOnError()
+	}
 }
-func (w *workBase) GetDescription() string {
-	return w.description
-}
 
-func (w *workBase) init(workPool *WorkPool) {
+func (w *workBase) init(workPool *WorkPool, name string, loopFunc LoopFunc) {
+	w.loopFunc = loopFunc
 	w.workPool = workPool
+	w.Name = name
+	if w.Name == "" {
+		panic(fmt.Errorf("work name not define"))
+	}
+	w.id = path.Join(workPool.Prefix, w.Name)
+	if w.loopFunc == nil {
+		panic(fmt.Errorf("work LoopFunc not define"))
+	}
+
+	w.WorkOptions = *NewWorkOptions()
+
 	w.stopped = make(chan bool)
 	w.ctx, w.cancel = context.WithCancel(workPool.ctx)
 }
@@ -121,4 +133,9 @@ func (w *workBase) finish() {
 }
 func (w *workBase) Join() {
 	<-w.stopped
+}
+func defaultOnError() OnError {
+	return func(work Work, err error) {
+		logrus.Error(fmt.Sprintf("work[%s] error: %s", work.Id(), err))
+	}
 }

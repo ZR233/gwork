@@ -16,11 +16,10 @@ type WorkSchedule struct {
 	schedule *Schedule
 }
 
-func newWorkSchedule(pool *WorkPool, schedule *Schedule, loopFunc LoopFunc, onError OnError) *WorkSchedule {
+func newWorkSchedule(pool *WorkPool, name string, schedule *Schedule, loopFunc LoopFunc) *WorkSchedule {
 	w := &WorkSchedule{}
-	w.loopFunc = loopFunc
-	w.onError = onError
-	w.init(pool)
+
+	w.init(pool, name, loopFunc)
 	w.schedule = schedule
 	w.newTimer()
 	return w
@@ -168,4 +167,13 @@ func (w *WorkSchedule) loop() {
 
 	w.newTimer()
 	w.excLoopFunc(w)
+}
+func (w *WorkSchedule) Run() {
+	w.checkOptions()
+	go runWork(w)
+}
+
+func (w *WorkSchedule) WithOptions(options *WorkOptions) Work {
+	w.WorkOptions = *options
+	return w
 }

@@ -7,11 +7,17 @@ type WorkInterval struct {
 	intervalTime time.Duration
 }
 
-func newWorkInterval(pool *WorkPool, intervalTime time.Duration, loopFunc LoopFunc, onError OnError) *WorkInterval {
+func (w *WorkInterval) WithOptions(options *WorkOptions) Work {
+	w.WorkOptions = *options
+	return w
+}
+
+func newWorkInterval(pool *WorkPool,
+	name string,
+	intervalTime time.Duration,
+	loopFunc LoopFunc) *WorkInterval {
 	w := &WorkInterval{}
-	w.loopFunc = loopFunc
-	w.onError = onError
-	w.init(pool)
+	w.init(pool, name, loopFunc)
 	w.intervalTime = intervalTime
 	w.loopTimer = time.NewTimer(w.intervalTime)
 	return w
@@ -24,4 +30,9 @@ func (w *WorkInterval) loop() {
 
 	w.loopTimer = time.NewTimer(w.intervalTime)
 	w.excLoopFunc(w)
+}
+
+func (w *WorkInterval) Run() {
+	w.checkOptions()
+	go runWork(w)
 }

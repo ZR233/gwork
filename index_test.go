@@ -20,22 +20,26 @@ func testLoopFunc() LoopFunc {
 }
 
 func TestNew(t *testing.T) {
-	pool := New()
-	pool.AddIntervalWork(time.Second*2, testLoopFunc(), testOnError())
+	pool := NewPool(nil)
+	pool.AddIntervalWork("testInterval", time.Second*2, testLoopFunc()).Run()
 	time.Sleep(time.Second * 5)
 	t.Log("close")
 	pool.Close()
 	pool.Join()
 }
 func TestNewSchedule(t *testing.T) {
-	pool := New()
+	pool := NewPool(nil)
+	h := 10
+	m := 9
 	se := 10
 
 	s := &Schedule{
+		Hour:   &h,
+		Minute: &m,
 		Second: &se,
 	}
 
-	pool.AddScheduleWork(s, testLoopFunc(), testOnError())
+	pool.AddScheduleWork("testInterval", s, testLoopFunc()).Run()
 
 	pool.Join()
 }
