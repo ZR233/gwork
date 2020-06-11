@@ -11,6 +11,31 @@ type Schedule struct {
 	Second  *int
 }
 
+func (s *Schedule) SetMonth(v time.Month) *Schedule {
+	s.Month = &v
+	return s
+}
+func (s *Schedule) SetWeekday(v time.Weekday) *Schedule {
+	s.Weekday = &v
+	return s
+}
+func (s *Schedule) SetDay(v int) *Schedule {
+	s.Day = &v
+	return s
+}
+func (s *Schedule) SetHour(v int) *Schedule {
+	s.Hour = &v
+	return s
+}
+func (s *Schedule) SetMinute(v int) *Schedule {
+	s.Minute = &v
+	return s
+}
+func (s *Schedule) SetSecond(v int) *Schedule {
+	s.Second = &v
+	return s
+}
+
 type WorkSchedule struct {
 	workBase
 	schedule *Schedule

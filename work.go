@@ -57,9 +57,9 @@ func (w *workBase) SetId(id string) {
 	w.id = id
 }
 func (w *workBase) checkOptions() {
-	if w.onError == nil {
+	if w.OnError == nil {
 		logrus.Warn(fmt.Sprintf("work[%s] using default OnError", w.Id()))
-		w.onError = defaultOnError()
+		w.OnError = defaultOnError()
 	}
 }
 
@@ -121,7 +121,7 @@ func (w *workBase) excLoopFunc(work Work) {
 
 	err = w.loopFunc(w.ctx)
 	if err != nil {
-		w.onError(work, err)
+		w.OnError(work, err)
 	}
 }
 

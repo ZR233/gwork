@@ -24,7 +24,7 @@ func Test_parseSchedule(t *testing.T) {
 		args         args
 		wantNextTime string
 	}{
-		{"nextMonthTime", args{&Schedule{Month: &month}}, "2021-03-01T00:00:00+08:00"},
+		{"nextMonthTime", args{NewSchedule().SetMonth(month)}, "2021-03-01T00:00:00+08:00"},
 		{"nextWeekday", args{&Schedule{Weekday: &weekday}}, "2020-12-30T00:00:00+08:00"},
 		{"nextDay", args{&Schedule{Hour: &hour, Minute: &minute}}, "2020-12-29T10:23:00+08:00"},
 	}

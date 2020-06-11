@@ -34,3 +34,6 @@ func NewWorkOptions() *WorkOptions {
 		Description:    "",
 	}
 }
+func NewSchedule() *Schedule {
+	return &Schedule{}
+}
